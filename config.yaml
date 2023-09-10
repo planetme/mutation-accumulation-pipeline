@@ -1,23 +1,28 @@
-ref_fna_file: ../ref/ref.fna.gz
-ref_fna_indexing_log: ../ref/ref.fna.gz.indexing.log
-reads_dir: ../reads/
+# Inputs
+ref_fna_file: ../sequences/alignment_reference/GCF_000182965.3/GCF_000182965.3_ASM18296v3_genomic.fa
+ref_fna_indexing_log: ../sequences/alignment_reference/GCF_000182965.3/GCF_000182965.3_ASM18296v3_genomic.fa.gz.indexing.log
+reads_dir: ../sequences/reads/
+fastq_screen_references: ../sequences/screens
+adapters: ../sequences/adapter/TruSeq3-PE-2.fa
+read_group_script: ./read_group.sh
 
-preqc_dir: ../fastqc/preqc/
-adaptrim_dir: ../fastqc/adaptrim_bbduk/
-adaptrim_qc_dir: ../fastqc/adaptrim_bbduk_qc/
-adaptrim_qualtrim_dir: ../fastqc/adaptrim_qualtrim/
-adaptrim_qualtrim_qc_dir: ../fastqc/adaptrim_qualtrim_qc/
-screening_dir: ../fastqc/adaptrim_qualtrim/screening
-fastq_screen_references: 'test_ref'
-picard_dir: /path
+# Outputs
+preqc_dir: ../outputs/quality_control/preqc/
+adaptrim_dir: ../outputs/quality_control/adaptrim_bbduk/
+adaptrim_qc_dir: ../outputs/quality_control/adaptrim_bbduk_qc/
+adaptrim_qualtrim_dir: ../outputs/quality_control/adaptrim_qualtrim/
+adaptrim_qualtrim_qc_dir: ../outputs/quality_control/adaptrim_qualtrim_qc/
+fastq_screen_conf: ../outputs/quality_control/adaptrim_qualtrim/screening/fastq_screen.conf
+screening_dir: ../outputs/quality_control/adaptrim_qualtrim/screening/
 
-sam_dir: ../samdata/
-samtools_reports_dir: /path
-aligned_bam_dir: /path
-merged_bam_dir: /path
-vcfs_dir: /path
-gvcfs_dir: /path
+samtools_reports_dir: ../outputs/quality_control/samtools_reports
+aligned_bam_dir: ../outputs/aligned_bams
+#merged_bam_dir: ../outputs/merged_bams
+picard_dir: /outputs/quality_control/picard/
+vcfs_dir: ../outputs/vcfs
+gvcfs_dir: ../outputs/gvcfs
 
+# File formatting
 read1_tag: 'R1'
 read2_tag: 'R2'
 adaptrim1_tag: '.adaptrim.1P'
@@ -27,12 +32,15 @@ qualtrim_u_tag: '_U'
 adaptrim_qualtrim_1p_tag: '.adaptrim.qualtrim_1P'
 adaptrim_qualtrim_2p_tag: '.adaptrim.qualtrim_2P'
 
-adapters: 'test_adapters'
-
+# Extensions
 reads_file_extension: '.fastq.gz'
-preqc_file_extension: '.fastqc.zip'
+preqc_file_extension: '_fastqc.zip'
 adaptrim_file_extension: '.fq.gz'
-adaptrim_qc_file_extension: '.fastqc.zip'
+adaptrim_qc_file_extension: '_fastqc.zip'
 adaptrim_qualtrim_file_extension: '.adaptrim.qualtrim.fq.gz'
-adaptrim_qualtrim_qc_file_extension: '.fastqc.zip'
-sam_file_extension: '.sam.gz'
+adaptrim_qualtrim_qc_file_extension: '_fastqc.zip'
+aligned_bam_file_extension: '_sorted.bam'
+aligned_bam_flagstat_file_extension: '_sorted.flagstat.txt'
+indexed_aligned_bam_file_extension: '_sorted.bam.bai'
+gvcfs_file_extension: '.g.vcf.gz'
+vcfs_file_extension: '.vcf.gz'

@@ -7,21 +7,23 @@ configfile: "config.yaml"
 REF_FNA_FILE = config['ref_fna_file']
 REF_FNA_INDEXING_LOG = ['ref_fna_indexing_log']
 READS_DIR = config['reads_dir']
-FASTQC_REPORTS_DIR = config['fastqc_reports_dir']
-SAM_DIR = config['sam_dir'] ###################
-SAMTOOLS_REPORTS_DIR = config['samtools_reports_dir']
-ALIGNED_BAM_DIR = config['aligned_bam_dir']
-MERGED_BAM_DIR = config['merged_bam_dir']
-VCFS_DIR = config['vcfs_dir']
-GVCFS_DIR = config['gvcfs_dir']
+FASTQ_SCREEN_REFERENCES = config['fastq_screen_references']
+ADAPTERS = config['adapters']
+READ_GROUP_SCRIPT = config["read_group_script"]
+
+#FASTQC_REPORTS_DIR = config['fastqc_reports_dir']
 PREQC_DIR = config['preqc_dir']
 ADAPTRIM_DIR = config['adaptrim_dir']
 ADAPTRIM_QC_DIR = config['adaptrim_qc_dir']
 ADAPTRIM_QUALTRIM_DIR = config['adaptrim_qualtrim_dir']
 ADAPTRIM_QUALTRIM_QC_DIR = config['adaptrim_qualtrim_qc_dir']
-QUALTRIM_DIR = config['qualtrim_dir']
 SCREENING_DIR = config['screening_dir']
-FASTQ_SCREEN_REFERENCES = config['fastq_screen_references']
+FASTQ_SCREEN_CONF = config['fastq_screen_conf']
+
+ALIGNED_BAM_DIR = config['aligned_bam_dir']
+SAMTOOLS_REPORTS_DIR = config['samtools_reports_dir']
+VCFS_DIR = config['vcfs_dir']
+GVCFS_DIR = config['gvcfs_dir']
 PICARD_DIR = config['picard_dir']
 
 READ1_TAG = config['read1_tag']
@@ -32,15 +34,18 @@ QUALTRIM_P_TAG = config['qualtrim_p_tag']
 QUALTRIM_U_TAG = config['qualtrim_u_tag']
 ADAPTRIM_QUALTRIM_1P_TAG = config['adaptrim_qualtrim_1p_tag']
 ADAPTRIM_QUALTRIM_2P_TAG = config['adaptrim_qualtrim_2p_tag']
-ADAPTERS = config['adapters']
+
 READS_FILE_EXTENSION = config['reads_file_extension']
 PREQC_FILE_EXTENSION = config['preqc_file_extension']
 ADAPTRIM_FILE_EXTENSION = config['adaptrim_file_extension']
 ADAPTRIM_QC_FILE_EXTENSION = config['adaptrim_qc_file_extension']
 ADAPTRIM_QUALTRIM_FILE_EXTENSION = config['adaptrim_qualtrim_file_extension']
 ADAPTRIM_QUALTRIM_QC_FILE_EXTENSION = config['adaptrim_qualtrim_qc_file_extension']
-SAM_FILE_EXTENSION = config['sam_file_extension']
-
+ALIGNED_BAM_FILE_EXTENSION = config['aligned_bam_file_extension']
+ALIGNED_BAM_FLAGSTAT_FILE_EXTENSION = config['aligned_bam_flagstat_file_extension']
+INDEXED_ALIGNED_BAM_FILE_EXTENSION = config['indexed_aligned_bam_file_extension']
+GVCFS_FILE_EXTENSION = config['gvcfs_file_extension']
+VCFS_FILE_EXTENSION = config['vcfs_file_extension']
 
 # Single file patterns: use Python string formatting to build
 # The safest way to mix global variables and wildcards in a formatted string is to remember the following:
@@ -54,20 +59,26 @@ SAM_FILE_EXTENSION = config['sam_file_extension']
 
 # Note the use of single curly braces for global variables
 # and double curly braces for snakemake wildcards
-# a_1_S28_R1_001.fastq.gz
+# Calbicans-1_S29_L006_R1_001.fastq.gz
+# reads_file_prefix = Calbicans-1_S29_L006_
+# reads_file_suffix = _001
 READ_ONE_FILE = f'{READS_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{READS_FILE_EXTENSION}'
 READ_TWO_FILE = f'{READS_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{READS_FILE_EXTENSION}'
-#TEST_FILE=f'{SAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{SAM_FILE_EXTENSION}'
+#TEST_FILE=f'{BAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{SAM_FILE_EXTENSION}'
 
+# Calbicans-1_S29_L006_R1_001_fastqc.zip
 PREQC_ONE_FILE = f'{PREQC_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{PREQC_FILE_EXTENSION}'
 PREQC_TWO_FILE = f'{PREQC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{PREQC_FILE_EXTENSION}'
 
+# Calbicans-1_S29_L006_R1_001.adaptrim.1P.fq.gz
 ADAPTRIM_ONE_FILE = f'{ADAPTRIM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ADAPTRIM1_TAG}{ADAPTRIM_FILE_EXTENSION}'
-ADAPTRIM_TWO_FILE = f'{ADAPTRIM_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{ADAPTRIM1_TAG}{ADAPTRIM_FILE_EXTENSION}'
+ADAPTRIM_TWO_FILE = f'{ADAPTRIM_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{ADAPTRIM2_TAG}{ADAPTRIM_FILE_EXTENSION}'
 
+# Calbicans-1_S29_L006_R1_001.adaptrim.1P_fastqc.zip
 ADAPTRIM_QC_ONE_FILE = f'{ADAPTRIM_QC_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ADAPTRIM1_TAG}{ADAPTRIM_QC_FILE_EXTENSION}'
-ADAPTRIM_QC_TWO_FILE = f'{ADAPTRIM_QC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{ADAPTRIM1_TAG}{ADAPTRIM_QC_FILE_EXTENSION}'
+ADAPTRIM_QC_TWO_FILE = f'{ADAPTRIM_QC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{ADAPTRIM2_TAG}{ADAPTRIM_QC_FILE_EXTENSION}'
 
+# Calbicans-1_S29_L006_R1_001._P.adaptrim.qualtrim.fq.gz
 ADAPTRIM_QUALTRIM_ONE_P_FILE = f'{ADAPTRIM_QUALTRIM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{QUALTRIM_P_TAG}{ADAPTRIM_QUALTRIM_FILE_EXTENSION}'
 ADAPTRIM_QUALTRIM_ONE_U_FILE = f'{ADAPTRIM_QUALTRIM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{QUALTRIM_U_TAG}{ADAPTRIM_QUALTRIM_FILE_EXTENSION}'
 ADAPTRIM_QUALTRIM_TWO_P_FILE = f'{ADAPTRIM_QUALTRIM_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{QUALTRIM_P_TAG}{ADAPTRIM_QUALTRIM_FILE_EXTENSION}'
@@ -75,15 +86,33 @@ ADAPTRIM_QUALTRIM_TWO_U_FILE = f'{ADAPTRIM_QUALTRIM_DIR}{{reads_file_prefix}}{RE
 #(config["adaptrim_qualtrim_path"] + "{sample}_{lane}.adaptrim.qualtrim.fq.gz")
 ADAPTRIM_QUALTRIM_BASEOUT_FILE = f'{ADAPTRIM_QUALTRIM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_FILE_EXTENSION}'
 
+# Calbicans-1_S29_L006_R1_001..adaptrim.qualtrim_1P_fastqc.zip
 ADAPTRIM_QUALTRIM_QC_ONE_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_1P_TAG}{ADAPTRIM_QUALTRIM_QC_FILE_EXTENSION}'
 ADAPTRIM_QUALTRIM_QC_TWO_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_1P_TAG}{ADAPTRIM_QUALTRIM_QC_FILE_EXTENSION}'
 
+# Calbicans-1_S29_L006_R1_001.adaptrim.qualtrim_1P.html
 ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_1P_TAG}.html'
 ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_1P_TAG}.html'
 
-SAM_ONE_FILE = f'{SAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{SAM_FILE_EXTENSION}'
-SAM_TWO_FILE = f'{SAM_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{SAM_FILE_EXTENSION}'
-#READONE_SAM_FILE = f'{SAM_DIR}{{sam_file_name}}{SAM_FILE_EXTENSION}'
+# Calbicans-1_S29_L006_001_sorted.bam
+#ALIGNED_BAM_ONE_FILE = f'{BAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ALIGNED_BAM_FILE_EXTENSION}'
+#ALIGNED_BAM_TWO_FILE = f'{BAM_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{ALIGNED_BAM_FILE_EXTENSION}'
+ALIGNED_BAM_FILE = f'{ALIGNED_BAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ALIGNED_BAM_FILE_EXTENSION}'
+
+# Calbicans-1_S29_L006_001_sorted.flagstat.txt
+ALIGNED_BAM_FLAGSTAT_FILE = f'{SAMTOOLS_REPORTS_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ALIGNED_BAM_FLAGSTAT_FILE_EXTENSION}'
+
+#MERGED_BAM_ONE_FILE = f'{BAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{MERGED_BAM_FILE_EXTENSION}'
+#MERGED_BAM_TWO_FILE = f'{BAM_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{MERGED_BAM_FILE_EXTENSION}'
+
+# Calbicans-1_S29_L006_001_sorted.bam.bai
+INDEXED_ALIGNED_BAM_FILE = f'{ALIGNED_BAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{INDEXED_ALIGNED_BAM_FILE_EXTENSION}'
+
+# Calbicans-1_S29_L006_001_sorted.g.vcf.gz
+GVCFS_FILE = f'{GVCFS_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{GVCFS_FILE_EXTENSION}'
+
+# Calbicans-1_S29_L006_001_sorted.vcf.gz
+VCFS_FILE = f'{VCFS_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{VCFS_FILE_EXTENSION}'
 
 #------------------------------------------------------------
 # File lists
@@ -91,7 +120,7 @@ SAM_TWO_FILE = f'{SAM_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{
 # Now we can use the single file patterns in conjunction with
 # glob_wildcards and expand to build the lists of all expected files.
 
-# the list of Read 1 and 2 file names
+# the list of Read 1 and 2 file names 
 READ_ONE_PREFIX,READ_ONE_SUFFIX = glob_wildcards(READ_ONE_FILE)
 READ_TWO_PREFIX,READ_TWO_SUFFIX = glob_wildcards(READ_TWO_FILE)
 
@@ -113,8 +142,8 @@ ADAPTRIM_QC_TWO_FILES=expand(ADAPTRIM_QC_TWO_FILE,reads_file_prefix=READ_TWO_PRE
 
 ADAPTRIM_QUALTRIM_ONE_P_FILES=expand(ADAPTRIM_QUALTRIM_ONE_P_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 ADAPTRIM_QUALTRIM_ONE_U_FILES=expand(ADAPTRIM_QUALTRIM_ONE_U_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
-ADAPTRIM_QUALTRIM_TWO_P_FILES=expand(ADAPTRIM_QUALTRIM_TWO_P_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
-ADAPTRIM_QUALTRIM_TWO_U_FILES=expand(ADAPTRIM_QUALTRIM_TWO_U_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
+ADAPTRIM_QUALTRIM_TWO_P_FILES=expand(ADAPTRIM_QUALTRIM_TWO_P_FILE,reads_file_prefix=READ_TWO_PREFIX, reads_file_suffix=READ_TWO_SUFFIX)
+ADAPTRIM_QUALTRIM_TWO_U_FILES=expand(ADAPTRIM_QUALTRIM_TWO_U_FILE,reads_file_prefix=READ_TWO_PREFIX, reads_file_suffix=READ_TWO_SUFFIX)
 
 ADAPTRIM_QUALTRIM_BASEOUT_FILES=expand(ADAPTRIM_QUALTRIM_BASEOUT_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 
@@ -122,12 +151,21 @@ ADAPTRIM_QUALTRIM_QC_ONE_FILES=expand(ADAPTRIM_QUALTRIM_QC_ONE_FILE,reads_file_p
 ADAPTRIM_QUALTRIM_QC_TWO_FILES=expand(ADAPTRIM_QUALTRIM_QC_TWO_FILE,reads_file_prefix=READ_TWO_PREFIX, reads_file_suffix=READ_TWO_SUFFIX)
 
 ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILES=expand(ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
-ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILES=expand(ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
+ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILES=expand(ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILE,reads_file_prefix=READ_TWO_PREFIX, reads_file_suffix=READ_TWO_SUFFIX)
 
-SAM_ONE_FILES=expand(SAM_ONE_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
-SAM_TWO_FILES=expand(SAM_TWO_FILE,reads_file_prefix=READ_TWO_PREFIX, reads_file_suffix=READ_TWO_SUFFIX)
+#ALIGNED_BAM_ONE_FILES=expand(ALIGNED_BAM_ONE_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
+#ALIGNED_BAM_TWO_FILES=expand(ALIGNED_BAM_TWO_FILE,reads_file_prefix=READ_TWO_PREFIX, reads_file_suffix=READ_TWO_SUFFIX)
+ALIGNED_BAM_FILES=expand(ALIGNED_BAM_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 
+ALIGNED_BAM_FLAGSTAT_FILES=expand(ALIGNED_BAM_FLAGSTAT_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 
+#MERGED_BAM_ONE_FILES=expand(ALIGNED_BAM_ONE_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
+#MERGED_BAM_TWO_FILES=expand(ALIGNED_BAM_TWO_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
+
+INDEXED_ALIGNED_BAM_FILES=expand(INDEXED_ALIGNED_BAM_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
+
+GVCFS_FILES=expand(GVCFS_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
+VCFS_FILES=expand(VCFS_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 
 # The list of all sam files
 # BOOK_FILE = f'{INPUT_DIR}{{book}}.txt'
@@ -147,22 +185,13 @@ SAM_TWO_FILES=expand(SAM_TWO_FILE,reads_file_prefix=READ_TWO_PREFIX, reads_file_
 # pseudo-rule that tries to build everything.
 # Just add all the final outputs that you want built.
 rule all:
-    #input: SAM_ONE_FILES, SAM_TWO_FILES, PREQC_ONE_FILES, PREQC_TWO_FILES, ADAPTRIM_ONE_FILES, ADAPTRIM_TWO_FILES, ADAPTRIM_QC_ONE_FILES, ADAPTRIM_QC_TWO_FILES
-    input: SAM_ONE_FILES, SAM_TWO_FILES, PREQC_ONE_FILES, PREQC_TWO_FILES, \
+    input: PREQC_ONE_FILES, PREQC_TWO_FILES, \
     ADAPTRIM_QUALTRIM_QC_ONE_FILES, ADAPTRIM_QUALTRIM_QC_TWO_FILES, \
-    ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILES, ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILES
+    ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILES, ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILES, \
+    ALIGNED_BAM_FILES, ALIGNED_BAM_FLAGSTAT_FILES, INDEXED_ALIGNED_BAM_FILES, VCFS_FILES
 
 rule clean:
-    shell: f'rm -rf {SAM_DIR}'
-
-"""
-rule test:
-    input: READ_ONE_FILE, READ_TWO_FILE
-    output: SAM_ONE_FILE, SAM_TWO_FILE
-    #output: READONE_SAM_FILE
-    #shell: 'cp {input} {output}'
-    shell: 'ls {input}; touch {output}'
-"""
+    shell: f'rm -rf {ALIGNED_BAM_DIR}'
 
 # Prequality control
 rule preqc:
@@ -215,19 +244,90 @@ rule adaptrim_qualtrim_qc:
     shell: 'fastqc {input.in1} {input.in2} --outdir={ADAPTRIM_QUALTRIM_DIR}'
 
 # Use fastq screen to determine the amount of library contamination
+# By default the program looks for a configuration file named “fastq_screen.conf” in the folder
+# where the FastQ Screen script it is located. If you wish to specify a different configuration file,
+# which may be placed in different folder, then use the –conf option:
 rule fastq_screen:
     input:
-        #input1 = (config["adaptrim_qualtrim_path"] + "{sample}_{lane}.adaptrim.qualtrim_{read}P.fq.gz")
         in1 = ADAPTRIM_QUALTRIM_QC_ONE_FILE,
         in2 = ADAPTRIM_QUALTRIM_QC_TWO_FILE
     output:
-        #(config["fastq_screen_report_path"] + "{sample}_{lane}.adaptrim.qualtrim_{read}P_screen.html")
         out1 = ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILE,
         out2 = ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILE
-    shell: 'fastq_screen --conf {FASTQ_SCREEN_REFERENCES} --aligner bowtie2 --outdir {SCREENING_DIR} {input.in1}'
+    shell: 'fastq_screen --conf {FASTQ_SCREEN_CONF} --aligner bowtie2 --outdir {SCREENING_DIR} {input.in1}'
 
 rule indexRef:
     input: REF_FNA_FILE
     log: REF_FNA_INDEXING_LOG
     shell: 'bwa-mem2 index {input}'
+
+# Align paired reads with bwa-mem2
+rule align_reads:
+    input:
+        in1 = ADAPTRIM_QUALTRIM_ONE_P_FILE,
+        in2 = ADAPTRIM_QUALTRIM_TWO_P_FILE
+    output: ALIGNED_BAM_FILE
+    shell: 'bash {READ_GROUP_SCRIPT} {REF_FNA_FILE} {input.in1} {input.in2} {READ_ONE_PREFIX} {ALIGNED_BAM_FILE}'
+
+# Calculate alignment statistics with samtools
+rule align_stats:
+    input: ALIGNED_BAM_FILE
+    output: ALIGNED_BAM_FLAGSTAT_FILE
+    shell: 'samtools flagstat {input} > {output}'
+
+# if running alignment jobs in parallel, distributing horizontally across hundreds of nodes
+# rather than trying to run a single job with dozens of cores, sorted BAM files from all nodes
+# need to be merged together for further downstream analysis.
+
+# Merge filtered bam files with samtools merge (done manually)
+
+# Mark and remove duplicates with Picard
+
+# Duplicate marking and removal
+# this rule is only needed if alignment is done across multiple computer nodes
+
+#rule picard_markdup:
+#	input:
+#		bam = (config["merged_bams_path"] + "{sample}_sorted_merged.bam")
+#	output:
+#		(config["picard_report_path"] + "{sample}_sorted_merged_DuplicationMetrics.txt"),
+#		(config["merged_bams_path"] + "{sample}_sorted_merged_rmdups.bam")
+#	params:
+#		outfile = (config["merged_bams_path"] + "{sample}_sorted_merged_rmdups.bam"),
+#		metrics = (config["picard_report_path"] + "{sample}_sorted_merged_DuplicationMetrics.txt"),
+#		tmp_dir = config["merged_bams_path"],
+#		to_rm = (config["merged_bams_path"] + "{sample}_sorted_merged.bam")
+#	shell:
+#       """
+#		set -euxo pipefail
+#		gatk MarkDuplicates --TMP_DIR {params.tmp_dir} -I {input.bam} -O {params.outfile} -M {params.metrics}
+#		if [ -s {params.outfile} ]
+#		then
+#			rm {params.to_rm}
+#		fi		
+#       """
+
+#---------------------------------------
+# Variant calling with HaplotypeCaller
+#---------------------------------------
+
+# Index bam files with samtools
+rule index_bam:
+    input: ALIGNED_BAM_FILE
+    output: INDEXED_ALIGNED_BAM_FILE
+    shell: 'samtools index {input} {output}'
+
+# Calculate genotype likelihoods with HaplotypeCaller
+rule haplotypecaller:
+    input:
+        bam = ALIGNED_BAM_FILE,
+        idx = INDEXED_ALIGNED_BAM_FILE
+    output: GVCFS_FILE
+    shell: 'gatk HaplotypeCaller --tmp-dir {GVCFS_DIR} -R {REF_FNA_FILE} -I {input.bam} -ERC GVCF -O {GVCFS_FILE}'
+
+# Joint call genotypes for each sample
+rule joint_genotype:
+    input: GVCFS_FILE
+    output: VCFS_FILE
+    shell: 'gatk GenotypeGVCFs --tmp-dir {VCFS_DIR} -R {REF_FNA_FILE} -V {input} -O {output}'
 
