@@ -5,11 +5,13 @@ configfile: "config.yaml"
 
 #use config.yaml to get the outputdirs instead for portability
 REF_FNA_FILE = config['ref_fna_file']
-REF_FNA_INDEXING_LOG = ['ref_fna_indexing_log']
+REF_FNA_DICT = config['ref_fna_dict']
+REF_FNA_FAI = config['ref_fna_fai']
+REF_FNA_INDEXING_LOG = config['ref_fna_indexing_log']
 READS_DIR = config['reads_dir']
 FASTQ_SCREEN_REFERENCES = config['fastq_screen_references']
 ADAPTERS = config['adapters']
-READ_GROUP_SCRIPT = config["read_group_script"]
+READ_GROUP_SCRIPT = config['read_group_script']
 
 #FASTQC_REPORTS_DIR = config['fastqc_reports_dir']
 PREQC_DIR = config['preqc_dir']
@@ -19,6 +21,7 @@ ADAPTRIM_QUALTRIM_DIR = config['adaptrim_qualtrim_dir']
 ADAPTRIM_QUALTRIM_QC_DIR = config['adaptrim_qualtrim_qc_dir']
 SCREENING_DIR = config['screening_dir']
 FASTQ_SCREEN_CONF = config['fastq_screen_conf']
+SNAKEMAKE_LOGS = config['snakemake_logs']
 
 ALIGNED_BAM_DIR = config['aligned_bam_dir']
 SAMTOOLS_REPORTS_DIR = config['samtools_reports_dir']
@@ -32,8 +35,8 @@ ADAPTRIM1_TAG = config['adaptrim1_tag']
 ADAPTRIM2_TAG = config['adaptrim2_tag']
 QUALTRIM_P_TAG = config['qualtrim_p_tag']
 QUALTRIM_U_TAG = config['qualtrim_u_tag']
-ADAPTRIM_QUALTRIM_1P_TAG = config['adaptrim_qualtrim_1p_tag']
-ADAPTRIM_QUALTRIM_2P_TAG = config['adaptrim_qualtrim_2p_tag']
+#ADAPTRIM_QUALTRIM_1P_TAG = config['adaptrim_qualtrim_1p_tag']
+#ADAPTRIM_QUALTRIM_2P_TAG = config['adaptrim_qualtrim_2p_tag']
 
 READS_FILE_EXTENSION = config['reads_file_extension']
 PREQC_FILE_EXTENSION = config['preqc_file_extension']
@@ -41,6 +44,7 @@ ADAPTRIM_FILE_EXTENSION = config['adaptrim_file_extension']
 ADAPTRIM_QC_FILE_EXTENSION = config['adaptrim_qc_file_extension']
 ADAPTRIM_QUALTRIM_FILE_EXTENSION = config['adaptrim_qualtrim_file_extension']
 ADAPTRIM_QUALTRIM_QC_FILE_EXTENSION = config['adaptrim_qualtrim_qc_file_extension']
+ADAPTRIM_QUALTRIM_QC_HTML_FILE_EXTENSION = config['adaptrim_qualtrim_qc_html_file_extension']
 ALIGNED_BAM_FILE_EXTENSION = config['aligned_bam_file_extension']
 ALIGNED_BAM_FLAGSTAT_FILE_EXTENSION = config['aligned_bam_flagstat_file_extension']
 INDEXED_ALIGNED_BAM_FILE_EXTENSION = config['indexed_aligned_bam_file_extension']
@@ -62,6 +66,8 @@ VCFS_FILE_EXTENSION = config['vcfs_file_extension']
 # Calbicans-1_S29_L006_R1_001.fastq.gz
 # reads_file_prefix = Calbicans-1_S29_L006_
 # reads_file_suffix = _001
+SAMPLE = f'{{reads_file_prefix}}'
+
 READ_ONE_FILE = f'{READS_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{READS_FILE_EXTENSION}'
 READ_TWO_FILE = f'{READS_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{READS_FILE_EXTENSION}'
 #TEST_FILE=f'{BAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{SAM_FILE_EXTENSION}'
@@ -78,7 +84,7 @@ ADAPTRIM_TWO_FILE = f'{ADAPTRIM_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file
 ADAPTRIM_QC_ONE_FILE = f'{ADAPTRIM_QC_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ADAPTRIM1_TAG}{ADAPTRIM_QC_FILE_EXTENSION}'
 ADAPTRIM_QC_TWO_FILE = f'{ADAPTRIM_QC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{ADAPTRIM2_TAG}{ADAPTRIM_QC_FILE_EXTENSION}'
 
-# Calbicans-1_S29_L006_R1_001._P.adaptrim.qualtrim.fq.gz
+# Calbicans-1_S29_L006_R1_001_P.adaptrim.qualtrim.fq.gz
 ADAPTRIM_QUALTRIM_ONE_P_FILE = f'{ADAPTRIM_QUALTRIM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{QUALTRIM_P_TAG}{ADAPTRIM_QUALTRIM_FILE_EXTENSION}'
 ADAPTRIM_QUALTRIM_ONE_U_FILE = f'{ADAPTRIM_QUALTRIM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{QUALTRIM_U_TAG}{ADAPTRIM_QUALTRIM_FILE_EXTENSION}'
 ADAPTRIM_QUALTRIM_TWO_P_FILE = f'{ADAPTRIM_QUALTRIM_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{QUALTRIM_P_TAG}{ADAPTRIM_QUALTRIM_FILE_EXTENSION}'
@@ -86,13 +92,18 @@ ADAPTRIM_QUALTRIM_TWO_U_FILE = f'{ADAPTRIM_QUALTRIM_DIR}{{reads_file_prefix}}{RE
 #(config["adaptrim_qualtrim_path"] + "{sample}_{lane}.adaptrim.qualtrim.fq.gz")
 ADAPTRIM_QUALTRIM_BASEOUT_FILE = f'{ADAPTRIM_QUALTRIM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_FILE_EXTENSION}'
 
-# Calbicans-1_S29_L006_R1_001..adaptrim.qualtrim_1P_fastqc.zip
-ADAPTRIM_QUALTRIM_QC_ONE_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_1P_TAG}{ADAPTRIM_QUALTRIM_QC_FILE_EXTENSION}'
-ADAPTRIM_QUALTRIM_QC_TWO_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_1P_TAG}{ADAPTRIM_QUALTRIM_QC_FILE_EXTENSION}'
+# Calbicans-1_S29_L006_R1_001.adaptrim.qualtrim_1P_fastqc.zip
+#fastqc does not support output file name
+#ADAPTRIM_QUALTRIM_QC_ONE_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_1P_TAG}{ADAPTRIM_QUALTRIM_QC_FILE_EXTENSION}'
+#ADAPTRIM_QUALTRIM_QC_TWO_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_2P_TAG}{ADAPTRIM_QUALTRIM_QC_FILE_EXTENSION}'
 
-# Calbicans-1_S29_L006_R1_001.adaptrim.qualtrim_1P.html
-ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_1P_TAG}.html'
-ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{ADAPTRIM_QUALTRIM_1P_TAG}.html'
+# Calbicans-1_S29_L006_R1_001_P.adaptrim.qualtrim_fastqc.zip
+ADAPTRIM_QUALTRIM_QC_ONE_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{QUALTRIM_P_TAG}{ADAPTRIM_QUALTRIM_QC_FILE_EXTENSION}'
+ADAPTRIM_QUALTRIM_QC_TWO_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{QUALTRIM_P_TAG}{ADAPTRIM_QUALTRIM_QC_FILE_EXTENSION}'
+
+# Calbicans-1_S29_L006_R1_001.adaptrim.qualtrim.html
+ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{QUALTRIM_P_TAG}{ADAPTRIM_QUALTRIM_QC_HTML_FILE_EXTENSION}'
+ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{QUALTRIM_P_TAG}{ADAPTRIM_QUALTRIM_QC_HTML_FILE_EXTENSION}'
 
 # Calbicans-1_S29_L006_001_sorted.bam
 #ALIGNED_BAM_ONE_FILE = f'{BAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ALIGNED_BAM_FILE_EXTENSION}'
@@ -124,6 +135,7 @@ VCFS_FILE = f'{VCFS_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{VC
 READ_ONE_PREFIX,READ_ONE_SUFFIX = glob_wildcards(READ_ONE_FILE)
 READ_TWO_PREFIX,READ_TWO_SUFFIX = glob_wildcards(READ_TWO_FILE)
 
+SAMPLE_LIST = expand(SAMPLE, reads_file_prefix=READ_ONE_PREFIX)
 READ_ONE_FILES = expand(READ_ONE_FILE, reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 READ_TWO_FILES = expand(READ_TWO_FILE, reads_file_prefix=READ_TWO_PREFIX, reads_file_suffix=READ_TWO_SUFFIX)
 
@@ -223,15 +235,18 @@ rule adaptrim_qc:
 # Trim back low quality scores at the end of reads with Trimmomatic
 rule adaptrim_qualtrim:
     input:
-        in1=ADAPTRIM_QC_ONE_FILE,
-        in2=ADAPTRIM_QC_TWO_FILE
+        in1=ADAPTRIM_ONE_FILE,
+        in2=ADAPTRIM_TWO_FILE
     output:
         out1=ADAPTRIM_QUALTRIM_ONE_P_FILE,
         out2=ADAPTRIM_QUALTRIM_ONE_U_FILE,
         out3=ADAPTRIM_QUALTRIM_TWO_P_FILE,
         out4=ADAPTRIM_QUALTRIM_TWO_U_FILE,
-        baseout=ADAPTRIM_QUALTRIM_BASEOUT_FILE
-    shell: 'trimmomatic PE {input.in1} {input.in2} -baseout {output.baseout} SLIDINGWINDOW:4:15 MINLEN:36'
+        #baseout=ADAPTRIM_QUALTRIM_BASEOUT_FILE
+    #log:
+        #{SNAKEMAKE_LOGS}ADAPTRIM_QUALTRIM.log
+    #shell: 'trimmomatic PE {input.in1} {input.in2} -baseout {output.baseout} SLIDINGWINDOW:4:15 MINLEN:36'
+    shell: 'trimmomatic PE {input.in1} {input.in2} {output.out1} {output.out2} {output.out3} {output.out4} SLIDINGWINDOW:4:15 MINLEN:36'
 
 # Generate fastqc report from trimmomatic outputs
 rule adaptrim_qualtrim_qc:
@@ -241,7 +256,7 @@ rule adaptrim_qualtrim_qc:
     output:
         out1 = ADAPTRIM_QUALTRIM_QC_ONE_FILE,
         out2 = ADAPTRIM_QUALTRIM_QC_TWO_FILE
-    shell: 'fastqc {input.in1} {input.in2} --outdir={ADAPTRIM_QUALTRIM_DIR}'
+    shell: 'fastqc {input.in1} {input.in2} --outdir={ADAPTRIM_QUALTRIM_QC_DIR}'
 
 # Use fastq screen to determine the amount of library contamination
 # By default the program looks for a configuration file named “fastq_screen.conf” in the folder
@@ -254,7 +269,8 @@ rule fastq_screen:
     output:
         out1 = ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILE,
         out2 = ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILE
-    shell: 'fastq_screen --conf {FASTQ_SCREEN_CONF} --aligner bowtie2 --outdir {SCREENING_DIR} {input.in1}'
+    #shell: 'fastq_screen --conf {FASTQ_SCREEN_CONF} --aligner bowtie2 --outdir {SCREENING_DIR} {input.in1}'
+    shell: 'fastq_screen --conf {FASTQ_SCREEN_CONF} --aligner bwa --outdir {SCREENING_DIR} {input.in1}'
 
 rule indexRef:
     input: REF_FNA_FILE
@@ -267,7 +283,8 @@ rule align_reads:
         in1 = ADAPTRIM_QUALTRIM_ONE_P_FILE,
         in2 = ADAPTRIM_QUALTRIM_TWO_P_FILE
     output: ALIGNED_BAM_FILE
-    shell: 'bash {READ_GROUP_SCRIPT} {REF_FNA_FILE} {input.in1} {input.in2} {READ_ONE_PREFIX} {ALIGNED_BAM_FILE}'
+    params: SAMPLE
+    shell: 'bash {READ_GROUP_SCRIPT} {REF_FNA_FILE} {input.in1} {input.in2} {params} {output}'
 
 # Calculate alignment statistics with samtools
 rule align_stats:
@@ -318,16 +335,31 @@ rule index_bam:
     shell: 'samtools index {input} {output}'
 
 # Calculate genotype likelihoods with HaplotypeCaller
+# The GATK uses two files to access and safety check access to the reference files: a .dict dictionary of the contig names and sizes
+# and a .fai fasta index file to allow efficient random access to the reference bases.
+# You have to generate these files in order to be able to use a Fasta file as reference.
+# samtools dict GCF_000182965.3_ASM18296v3_genomic.fa -o GCF_000182965.3_ASM18296v3_genomic.dict
+# samtools faidx GCF_000182965.3_ASM18296v3_genomic.fa -o GCF_000182965.3_ASM18296v3_genomic.fa.fai
+rule create_ref_dict:
+    input: REF_FNA_FILE
+    output: REF_FNA_DICT
+    shell: 'samtools dict {input} -o {output}'
+
+rule create_ref_fai:
+    input: REF_FNA_FILE
+    output: REF_FNA_FAI
+    shell: 'samtools faidx {input} -o {output}'
+
 rule haplotypecaller:
-    input:
+    input: 
         bam = ALIGNED_BAM_FILE,
         idx = INDEXED_ALIGNED_BAM_FILE
     output: GVCFS_FILE
-    shell: 'gatk HaplotypeCaller --tmp-dir {GVCFS_DIR} -R {REF_FNA_FILE} -I {input.bam} -ERC GVCF -O {GVCFS_FILE}'
+    shell: 'gatk HaplotypeCaller --TMP_DIR {GVCFS_DIR} -R {REF_FNA_FILE} -I {input.bam} -ERC GVCF -O {output}'
 
 # Joint call genotypes for each sample
 rule joint_genotype:
     input: GVCFS_FILE
     output: VCFS_FILE
-    shell: 'gatk GenotypeGVCFs --tmp-dir {VCFS_DIR} -R {REF_FNA_FILE} -V {input} -O {output}'
+    shell: 'gatk GenotypeGVCFs --TMP_DIR {VCFS_DIR} -R {REF_FNA_FILE} -V {input} -O {output}'
 
