@@ -310,26 +310,26 @@ rule align_stats:
 # Duplicate marking and removal
 # this rule is only needed if alignment is done across multiple computer nodes
 
-#rule picard_markdup:
-#	input:
-#		bam = (config["merged_bams_path"] + "{sample}_sorted_merged.bam")
-#	output:
-#		(config["picard_report_path"] + "{sample}_sorted_merged_DuplicationMetrics.txt"),
-#		(config["merged_bams_path"] + "{sample}_sorted_merged_rmdups.bam")
-#	params:
-#		outfile = (config["merged_bams_path"] + "{sample}_sorted_merged_rmdups.bam"),
-#		metrics = (config["picard_report_path"] + "{sample}_sorted_merged_DuplicationMetrics.txt"),
-#		tmp_dir = config["merged_bams_path"],
-#		to_rm = (config["merged_bams_path"] + "{sample}_sorted_merged.bam")
-#	shell:
-#       """
-#		set -euxo pipefail
-#		gatk MarkDuplicates --REMOVE_DUPLICATES--TMP_DIR {params.tmp_dir} -I {input.bam} -O {params.outfile} -M {params.metrics}
-#		if [ -s {params.outfile} ]
-#		then
-#			rm {params.to_rm}
-#		fi		
-#       """
+rule picard_markdup:
+	input:
+		bam = (config["merged_bams_path"] + "{sample}_sorted_merged.bam")
+	output:
+		(config["picard_report_path"] + "{sample}_sorted_merged_DuplicationMetrics.txt"),
+		(config["merged_bams_path"] + "{sample}_sorted_merged_rmdups.bam")
+	params:
+		outfile = (config["merged_bams_path"] + "{sample}_sorted_merged_rmdups.bam"),
+		metrics = (config["picard_report_path"] + "{sample}_sorted_merged_DuplicationMetrics.txt"),
+		tmp_dir = config["merged_bams_path"],
+		to_rm = (config["merged_bams_path"] + "{sample}_sorted_merged.bam")
+	shell:
+       """
+		set -euxo pipefail
+		gatk MarkDuplicates --REMOVE_DUPLICATES--TMP_DIR {params.tmp_dir} -I {input.bam} -O {params.outfile} -M {params.metrics}
+		if [ -s {params.outfile} ]
+		then
+			rm {params.to_rm}
+		fi		
+       """
 
 #---------------------------------------
 # Variant calling with HaplotypeCaller
