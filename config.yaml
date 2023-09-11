@@ -15,6 +15,7 @@ adaptrim_qc_dir: ../outputs/quality_control/adaptrim_bbduk_qc/
 adaptrim_qualtrim_dir: ../outputs/quality_control/adaptrim_qualtrim/
 adaptrim_qualtrim_qc_dir: ../outputs/quality_control/adaptrim_qualtrim_qc/
 fastq_screen_conf: ./fastq_screen.conf
+fastq_screen_logfile_extension: '_fastq_screen.log'
 screening_dir: ../outputs/quality_control/adaptrim_qualtrim/screening/
 snakemake_logs: ./job_logs/
 

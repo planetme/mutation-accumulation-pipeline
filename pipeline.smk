@@ -21,6 +21,7 @@ ADAPTRIM_QUALTRIM_DIR = config['adaptrim_qualtrim_dir']
 ADAPTRIM_QUALTRIM_QC_DIR = config['adaptrim_qualtrim_qc_dir']
 SCREENING_DIR = config['screening_dir']
 FASTQ_SCREEN_CONF = config['fastq_screen_conf']
+FASTQ_SCREEN_LOGFILE_EXTENSION = config['fastq_screen_logfile_extension']
 SNAKEMAKE_LOGS = config['snakemake_logs']
 
 ALIGNED_BAM_DIR = config['aligned_bam_dir']
@@ -105,7 +106,7 @@ ADAPTRIM_QUALTRIM_QC_TWO_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}
 # ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{QUALTRIM_P_TAG}{ADAPTRIM_QUALTRIM_QC_HTML_FILE_EXTENSION}'
 # ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILE = f'{ADAPTRIM_QUALTRIM_QC_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{QUALTRIM_P_TAG}{ADAPTRIM_QUALTRIM_QC_HTML_FILE_EXTENSION}'
 
-SCREEN_LOG = f'{SCREENING_DIR}fastq_screen.log'
+FASTSCREEN_LOGFILE = f'{SCREENING_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{FASTQ_SCREEN_LOGFILE_EXTENSION}'
 
 # Calbicans-1_S29_L006_001_sorted.bam
 #ALIGNED_BAM_ONE_FILE = f'{BAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{ALIGNED_BAM_FILE_EXTENSION}'
@@ -167,6 +168,8 @@ ADAPTRIM_QUALTRIM_QC_TWO_FILES=expand(ADAPTRIM_QUALTRIM_QC_TWO_FILE,reads_file_p
 #ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILES=expand(ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 #ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILES=expand(ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILE,reads_file_prefix=READ_TWO_PREFIX, reads_file_suffix=READ_TWO_SUFFIX)
 
+FASTSCREEN_LOGFILES=expand(FASTSCREEN_LOGFILE,reads_file_prefix=READ_TWO_PREFIX, reads_file_suffix=READ_TWO_SUFFIX)
+
 #ALIGNED_BAM_ONE_FILES=expand(ALIGNED_BAM_ONE_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 #ALIGNED_BAM_TWO_FILES=expand(ALIGNED_BAM_TWO_FILE,reads_file_prefix=READ_TWO_PREFIX, reads_file_suffix=READ_TWO_SUFFIX)
 ALIGNED_BAM_FILES=expand(ALIGNED_BAM_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
@@ -201,7 +204,8 @@ VCFS_FILES=expand(VCFS_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix
 rule all:
     input: PREQC_ONE_FILES, PREQC_TWO_FILES, \
     ADAPTRIM_QUALTRIM_QC_ONE_FILES, ADAPTRIM_QUALTRIM_QC_TWO_FILES, \
-    SCREEN_LOG, \
+    ADAPTRIM_QC_ONE_FILES, ADAPTRIM_QC_TWO_FILES, \
+    FASTSCREEN_LOGFILES, \
     ALIGNED_BAM_FILES, ALIGNED_BAM_FLAGSTAT_FILES, INDEXED_ALIGNED_BAM_FILES, VCFS_FILES
 
 rule clean:
@@ -268,12 +272,12 @@ rule fastq_screen:
     input:
         in1 = ADAPTRIM_QUALTRIM_QC_ONE_FILE,
         in2 = ADAPTRIM_QUALTRIM_QC_TWO_FILE
-    log: '{SCREENING_DIR}fastq_screen.log'
+    log: FASTSCREEN_LOGFILE
 #   output:
 #       out1 = ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILE,
 #       out2 = ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILE
     #shell: 'fastq_screen --conf {FASTQ_SCREEN_CONF} --aligner bowtie2 --outdir {SCREENING_DIR} {input.in1}'
-    shell: 'fastq_screen --conf {FASTQ_SCREEN_CONF} --aligner bwa --outdir {SCREENING_DIR} {input.in1}'
+    shell: 'fastq_screen --conf {FASTQ_SCREEN_CONF} --aligner bwa --outdir {SCREENING_DIR} {input.in1} >{log}'
 
 rule indexRef:
     input: REF_FNA_FILE
