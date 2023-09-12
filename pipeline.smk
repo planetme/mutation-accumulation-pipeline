@@ -51,6 +51,8 @@ ALIGNED_BAM_FLAGSTAT_FILE_EXTENSION = config['aligned_bam_flagstat_file_extensio
 INDEXED_ALIGNED_BAM_FILE_EXTENSION = config['indexed_aligned_bam_file_extension']
 GVCFS_FILE_EXTENSION = config['gvcfs_file_extension']
 VCFS_FILE_EXTENSION = config['vcfs_file_extension']
+PICARD_FILE_EXTENSION = config['picard_file_extension']
+PICARD_RPT_FILE_EXTENSION = config['picard_rpt_file_extension']
 
 # Single file patterns: use Python string formatting to build
 # The safest way to mix global variables and wildcards in a formatted string is to remember the following:
@@ -122,11 +124,16 @@ ALIGNED_BAM_FLAGSTAT_FILE = f'{SAMTOOLS_REPORTS_DIR}{{reads_file_prefix}}{READ1_
 # Calbicans-1_S29_L006_001_sorted.bam.bai
 INDEXED_ALIGNED_BAM_FILE = f'{ALIGNED_BAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{INDEXED_ALIGNED_BAM_FILE_EXTENSION}'
 
+# Calbicans-1_S29_L006_001_sorted_rmdups.bam
+PICARD_FILE = f'{PICARD_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{PICARD_FILE_EXTENSION}'
+PICARD_RPT_FILE = f'{PICARD_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{PICARD_RPT_FILE_EXTENSION}'
+
 # Calbicans-1_S29_L006_001_sorted.g.vcf.gz
 GVCFS_FILE = f'{GVCFS_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{GVCFS_FILE_EXTENSION}'
 
 # Calbicans-1_S29_L006_001_sorted.vcf.gz
 VCFS_FILE = f'{VCFS_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{VCFS_FILE_EXTENSION}'
+
 
 #------------------------------------------------------------
 # File lists
@@ -181,6 +188,9 @@ ALIGNED_BAM_FLAGSTAT_FILES=expand(ALIGNED_BAM_FLAGSTAT_FILE,reads_file_prefix=RE
 
 INDEXED_ALIGNED_BAM_FILES=expand(INDEXED_ALIGNED_BAM_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 
+PICARD_FILES=expand(PICARD_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
+PICARD_RPT_FILES=expand(PICARD_RPT_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
+
 GVCFS_FILES=expand(GVCFS_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 VCFS_FILES=expand(VCFS_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 
@@ -203,10 +213,10 @@ VCFS_FILES=expand(VCFS_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix
 # Just add all the final outputs that you want built.
 rule all:
     input: PREQC_ONE_FILES, PREQC_TWO_FILES, \
-    ADAPTRIM_QUALTRIM_QC_ONE_FILES, ADAPTRIM_QUALTRIM_QC_TWO_FILES, \
     ADAPTRIM_QC_ONE_FILES, ADAPTRIM_QC_TWO_FILES, \
+    ADAPTRIM_QUALTRIM_QC_ONE_FILES, ADAPTRIM_QUALTRIM_QC_TWO_FILES, \
     FASTSCREEN_LOGFILES, \
-    ALIGNED_BAM_FILES, ALIGNED_BAM_FLAGSTAT_FILES, INDEXED_ALIGNED_BAM_FILES, VCFS_FILES
+    PICARD_RPT_FILES, PICARD_FILES, ALIGNED_BAM_FLAGSTAT_FILES, INDEXED_ALIGNED_BAM_FILES, VCFS_FILES
 
 rule clean:
     shell: f'rm -rf {ALIGNED_BAM_DIR}'
@@ -272,12 +282,12 @@ rule fastq_screen:
     input:
         in1 = ADAPTRIM_QUALTRIM_QC_ONE_FILE,
         in2 = ADAPTRIM_QUALTRIM_QC_TWO_FILE
-    log: FASTSCREEN_LOGFILE
+    output: FASTSCREEN_LOGFILE
 #   output:
 #       out1 = ADAPTRIM_QUALTRIM_QC_ONE_SCREEN_FILE,
 #       out2 = ADAPTRIM_QUALTRIM_QC_TWO_SCREEN_FILE
     #shell: 'fastq_screen --conf {FASTQ_SCREEN_CONF} --aligner bowtie2 --outdir {SCREENING_DIR} {input.in1}'
-    shell: 'fastq_screen --conf {FASTQ_SCREEN_CONF} --aligner bwa --outdir {SCREENING_DIR} {input.in1} >{log}'
+    shell: 'fastq_screen --conf {FASTQ_SCREEN_CONF} --aligner bwa --outdir {SCREENING_DIR} {input.in1} >{output}'
 
 rule indexRef:
     input: REF_FNA_FILE
@@ -303,7 +313,7 @@ rule align_stats:
 # rather than trying to run a single job with dozens of cores, sorted BAM files from all nodes
 # need to be merged together for further downstream analysis.
 
-# Merge filtered bam files with samtools merge (done manually)
+# Merge filtered bam files with samtools merge (done manually if needed)
 
 # Mark and remove duplicates with Picard
 
@@ -311,25 +321,11 @@ rule align_stats:
 # this rule is only needed if alignment is done across multiple computer nodes
 
 rule picard_markdup:
-	input:
-		bam = (config["merged_bams_path"] + "{sample}_sorted_merged.bam")
-	output:
-		(config["picard_report_path"] + "{sample}_sorted_merged_DuplicationMetrics.txt"),
-		(config["merged_bams_path"] + "{sample}_sorted_merged_rmdups.bam")
-	params:
-		outfile = (config["merged_bams_path"] + "{sample}_sorted_merged_rmdups.bam"),
-		metrics = (config["picard_report_path"] + "{sample}_sorted_merged_DuplicationMetrics.txt"),
-		tmp_dir = config["merged_bams_path"],
-		to_rm = (config["merged_bams_path"] + "{sample}_sorted_merged.bam")
-	shell:
-       """
-		set -euxo pipefail
-		gatk MarkDuplicates --REMOVE_DUPLICATES--TMP_DIR {params.tmp_dir} -I {input.bam} -O {params.outfile} -M {params.metrics}
-		if [ -s {params.outfile} ]
-		then
-			rm {params.to_rm}
-		fi		
-       """
+    input: ALIGNED_BAM_FILE
+    output: 
+        rmdups_bam=PICARD_FILE,
+        report_file=PICARD_RPT_FILE
+    shell: 'gatk MarkDuplicates --REMOVE_DUPLICATES --TMP_DIR {PICARD_DIR} -I {input} -O {output.rmdups_bam} -M {output.report_file}'
 
 #---------------------------------------
 # Variant calling with HaplotypeCaller
