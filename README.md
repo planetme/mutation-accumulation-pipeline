@@ -15,4 +15,4 @@ fastqc, BBMap, Trimmomatic, fastq_screen, bwa-mem2, samtools, picard, gatk4
 5. Next, download your species' reference genome under a new directory titled `alignment_reference`.
 6. If you want to screen against suspected contaminants, download reference genomes into a directory named `screens`.
 7. Run the pipeline on -np mode to check if the expected files will be generated.
-8. Run the pipeline for real.
+8. Run the pipeline with the following command: snakemake -s pipeline.smk --cores <number>.
