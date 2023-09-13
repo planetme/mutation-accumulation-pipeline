@@ -6,15 +6,15 @@ This pipeline currently does not support multiple lane sequencing runs for now.
 
 ## Instructions
 1. Install the following packages using conda:
-
-fastqc
-BBMap
-Trimmomatic
-fastq_screen
-bwa-mem2
-samtools
-picard
-gatk4
+    
+  fastqc
+  BBMap
+  Trimmomatic
+  fastq_screen
+  bwa-mem2
+  samtools
+  picard
+  gatk4
 
 2. In your working directory, create a `pipelines` directory and put the config, readgroup shellscript, fastq_screen config, and pipeline config in there.
 3. Create a directory called `sequences` and move your raw sequencing outputs into a new directory underneath named `reads`.
