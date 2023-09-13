@@ -318,7 +318,6 @@ rule align_stats:
 # Mark and remove duplicates with Picard
 
 # Duplicate marking and removal
-# this rule is only needed if alignment is done across multiple computer nodes
 
 rule picard_markdup:
     input: ALIGNED_BAM_FILE
@@ -333,7 +332,7 @@ rule picard_markdup:
 
 # Index bam files with samtools
 rule index_bam:
-    input: ALIGNED_BAM_FILE
+    input: PICARD_FILE
     output: INDEXED_ALIGNED_BAM_FILE
     shell: 'samtools index {input} {output}'
 
@@ -355,7 +354,7 @@ rule create_ref_fai:
 
 rule haplotypecaller:
     input: 
-        bam = ALIGNED_BAM_FILE,
+        bam = PICARD_FILE,
         idx = INDEXED_ALIGNED_BAM_FILE
     output: GVCFS_FILE
     shell: 'gatk HaplotypeCaller --TMP_DIR {GVCFS_DIR} -R {REF_FNA_FILE} -I {input.bam} -ERC GVCF -O {output}'
