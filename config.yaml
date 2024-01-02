@@ -23,7 +23,9 @@ samtools_reports_dir: ../outputs/quality_control/samtools_reports/
 aligned_bam_dir: ../outputs/aligned_bams/
 #merged_bam_dir: ../outputs/merged_bams
 picard_dir: ../outputs/quality_control/picard/
-vcfs_dir: ../outputs/vcfs/
+combined_dir: ../outputs/combined/
+combined_gvcf: ../outputs/combined/cohort.g.vcf.gz
+combined_vcf: ../coutputs/combined/cohort.vcf.gz
 gvcfs_dir: ../outputs/gvcfs/
 
 # File formatting
