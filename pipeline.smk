@@ -26,7 +26,7 @@ SNAKEMAKE_LOGS = config['snakemake_logs']
 
 ALIGNED_BAM_DIR = config['aligned_bam_dir']
 SAMTOOLS_REPORTS_DIR = config['samtools_reports_dir']
-VCFS_DIR = config['vcfs_dir']
+VCFS_DIR = config['combined_dir']
 GVCFS_DIR = config['gvcfs_dir']
 PICARD_DIR = config['picard_dir']
 COMBINED_DIR = config['combined_dir']
