@@ -367,9 +367,12 @@ rule haplotypecaller:
 # Combine per-sample gVCF files produced by HaplotypeCaller into a multi-sample gVCF file
 rule combine_gvcf:
     #input: lambda wildcards: glob(f'GVCFS_FILE_DIR/*')
-    input: glob.glob('../outputs/gvcfs/*')
+    input: 
+        in1: glob.glob('../outputs/gvcfs/*'),
+        in2: GVCFS_FILES
     output: COMBINED_GVCF
-    shell: 'gatk CombineGVCFs -R {REF_FNA_FILE} -V {input} -O {output}'
+    shell: 'gatk CombineGVCFs -R {REF_FNA_FILE} -V {in1} -O {output}'
+
 
 # Joint call genotypes for each sample
 rule joint_genotype:
