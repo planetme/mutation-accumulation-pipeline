@@ -371,7 +371,7 @@ rule combine_gvcf:
         in1 = glob.glob('../outputs/gvcfs/*'),
         in2 = GVCFS_FILES
     output: COMBINED_GVCF
-    shell: 'gatk CombineGVCFs -R {REF_FNA_FILE} -V {in1} -O {output}'
+    shell: 'gatk CombineGVCFs -R {REF_FNA_FILE} -V {input.in1} -O {output}'
 
 
 # Joint call genotypes for each sample
