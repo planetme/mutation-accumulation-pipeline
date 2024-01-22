@@ -368,8 +368,8 @@ rule haplotypecaller:
 rule combine_gvcf:
     #input: lambda wildcards: glob(f'GVCFS_FILE_DIR/*')
     input: 
-        in1: glob.glob('../outputs/gvcfs/*'),
-        in2: GVCFS_FILES
+        in1 = glob.glob('../outputs/gvcfs/*'),
+        in2 = GVCFS_FILES
     output: COMBINED_GVCF
     shell: 'gatk CombineGVCFs -R {REF_FNA_FILE} -V {in1} -O {output}'
 
