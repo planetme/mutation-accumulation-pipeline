@@ -26,12 +26,9 @@ SNAKEMAKE_LOGS = config['snakemake_logs']
 
 ALIGNED_BAM_DIR = config['aligned_bam_dir']
 SAMTOOLS_REPORTS_DIR = config['samtools_reports_dir']
-VCFS_DIR = config['combined_dir']
+VCFS_DIR = config['vcfs_dir']
 GVCFS_DIR = config['gvcfs_dir']
 PICARD_DIR = config['picard_dir']
-COMBINED_DIR = config['combined_dir']
-COMBINED_GVCF = config['combined_gvcf']
-COMBINED_VCF = config['combined_vcf']
 
 READ1_TAG = config['read1_tag']
 READ2_TAG = config['read2_tag']
@@ -124,18 +121,18 @@ ALIGNED_BAM_FLAGSTAT_FILE = f'{SAMTOOLS_REPORTS_DIR}{{reads_file_prefix}}{READ1_
 #MERGED_BAM_ONE_FILE = f'{BAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{MERGED_BAM_FILE_EXTENSION}'
 #MERGED_BAM_TWO_FILE = f'{BAM_DIR}{{reads_file_prefix}}{READ2_TAG}{{reads_file_suffix}}{MERGED_BAM_FILE_EXTENSION}'
 
-# Calbicans-1_S29_L006_001_sorted.bam.bai
-INDEXED_ALIGNED_BAM_FILE = f'{ALIGNED_BAM_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{INDEXED_ALIGNED_BAM_FILE_EXTENSION}'
-
 # Calbicans-1_S29_L006_001_sorted_rmdups.bam
 PICARD_FILE = f'{PICARD_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{PICARD_FILE_EXTENSION}'
 PICARD_RPT_FILE = f'{PICARD_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{PICARD_RPT_FILE_EXTENSION}'
+
+# Calbicans-1_S29_L006_001_sorted.bam.bai
+INDEXED_ALIGNED_BAM_FILE = f'{PICARD_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{INDEXED_ALIGNED_BAM_FILE_EXTENSION}'
 
 # Calbicans-1_S29_L006_001_sorted.g.vcf.gz
 GVCFS_FILE = f'{GVCFS_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{GVCFS_FILE_EXTENSION}'
 
 # Calbicans-1_S29_L006_001_sorted.vcf.gz
-#VCFS_FILE = f'{VCFS_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{VCFS_FILE_EXTENSION}'
+VCFS_FILE = f'{VCFS_DIR}{{reads_file_prefix}}{READ1_TAG}{{reads_file_suffix}}{VCFS_FILE_EXTENSION}'
 
 
 #------------------------------------------------------------
@@ -195,8 +192,7 @@ PICARD_FILES=expand(PICARD_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_su
 PICARD_RPT_FILES=expand(PICARD_RPT_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 
 GVCFS_FILES=expand(GVCFS_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
-#VCFS_FILES=expand(VCFS_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
-
+VCFS_FILES=expand(VCFS_FILE,reads_file_prefix=READ_ONE_PREFIX, reads_file_suffix=READ_ONE_SUFFIX)
 
 # The list of all sam files
 # BOOK_FILE = f'{INPUT_DIR}{{book}}.txt'
@@ -220,8 +216,7 @@ rule all:
     ADAPTRIM_QC_ONE_FILES, ADAPTRIM_QC_TWO_FILES, \
     ADAPTRIM_QUALTRIM_QC_ONE_FILES, ADAPTRIM_QUALTRIM_QC_TWO_FILES, \
     FASTSCREEN_LOGFILES, \
-    PICARD_RPT_FILES, PICARD_FILES, ALIGNED_BAM_FLAGSTAT_FILES, INDEXED_ALIGNED_BAM_FILES, COMBINED_GVCF, \
-    COMBINED_VCF
+    PICARD_RPT_FILES, PICARD_FILES, ALIGNED_BAM_FLAGSTAT_FILES, INDEXED_ALIGNED_BAM_FILES, VCFS_FILES
 
 rule clean:
     shell: f'rm -rf {ALIGNED_BAM_DIR}'
@@ -323,6 +318,7 @@ rule align_stats:
 # Mark and remove duplicates with Picard
 
 # Duplicate marking and removal
+# this rule is only needed if alignment is done across multiple computer nodes
 
 rule picard_markdup:
     input: ALIGNED_BAM_FILE
@@ -364,18 +360,9 @@ rule haplotypecaller:
     output: GVCFS_FILE
     shell: 'gatk HaplotypeCaller --TMP_DIR {GVCFS_DIR} -R {REF_FNA_FILE} -I {input.bam} -ERC GVCF -O {output}'
 
-# Combine per-sample gVCF files produced by HaplotypeCaller into a multi-sample gVCF file
-rule combine_gvcf:
-    #input: lambda wildcards: glob(f'GVCFS_FILE_DIR/*')
-    input: 
-        in1 = glob.glob('../outputs/gvcfs/*'),
-        in2 = GVCFS_FILES
-    output: COMBINED_GVCF
-    shell: 'gatk CombineGVCFs -R {REF_FNA_FILE} -V {input.in1} -O {output}'
-
-
 # Joint call genotypes for each sample
 rule joint_genotype:
-    input: COMBINED_GVCF
-    output: COMBINED_VCF
-    shell: 'gatk GenotypeGVCFs --TMP_DIR {COMBINED_DIR} -R {REF_FNA_FILE} -V {input} -O {output}'
+    input: GVCFS_FILE
+    output: VCFS_FILE
+    shell: 'gatk GenotypeGVCFs --TMP_DIR {VCFS_DIR} -R {REF_FNA_FILE} -V {input} -O {output}'
+
